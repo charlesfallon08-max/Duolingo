@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { findLesson } from "./data/course";
+import { useAuth } from "./lib/auth";
 import { useProgress } from "./lib/progress";
 import Home from "./components/Home";
 import LessonScreen from "./components/LessonScreen";
@@ -10,7 +11,8 @@ type View =
 
 export default function App() {
   const [view, setView] = useState<View>({ screen: "home" });
-  const { progress, completeLesson } = useProgress();
+  const auth = useAuth();
+  const { progress, completeLesson } = useProgress(auth.user?.id ?? null);
 
   if (view.screen === "lesson") {
     const { unit, lesson } = findLesson(view.unitId, view.lessonId);
@@ -31,6 +33,7 @@ export default function App() {
   return (
     <Home
       progress={progress}
+      auth={auth}
       onStartLesson={(unitId, lessonId, practice) =>
         setView({ screen: "lesson", unitId, lessonId, practice })
       }

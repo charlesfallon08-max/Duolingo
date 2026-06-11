@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Progress } from "../types";
 import { course } from "../data/course";
+import { supabase } from "./supabase";
 
 export const XP_LESSON = 10;
 export const XP_PERFECT_BONUS = 5;
@@ -24,6 +25,21 @@ function load(): Progress {
   }
 }
 
+/** Fusionne deux progressions (appareil + serveur) sans jamais perdre d'acquis. */
+function mergeProgress(a: Progress, b: Progress): Progress {
+  const lessons = { ...a.lessons };
+  for (const [id, rec] of Object.entries(b.lessons)) {
+    const cur = lessons[id];
+    lessons[id] = cur
+      ? {
+          completions: Math.max(cur.completions, rec.completions),
+          perfect: cur.perfect || rec.perfect,
+        }
+      : rec;
+  }
+  return { xp: Math.max(a.xp, b.xp), lessons };
+}
+
 export function levelFromXp(xp: number): number {
   return Math.floor(xp / XP_PER_LEVEL) + 1;
 }
@@ -32,12 +48,49 @@ export function xpIntoLevel(xp: number): number {
   return xp % XP_PER_LEVEL;
 }
 
-export function useProgress() {
+/**
+ * Progression du joueur : toujours sauvegardée en local, et synchronisée
+ * avec Supabase quand un utilisateur est connecté (userId non null).
+ */
+export function useProgress(userId: string | null) {
   const [progress, setProgress] = useState<Progress>(load);
 
+  // À la connexion : récupère la progression du serveur et fusionne
+  useEffect(() => {
+    if (!supabase || !userId) return;
+    let cancelled = false;
+    supabase
+      .from("progress")
+      .select("data")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data?.data) return;
+        const remote = data.data as Partial<Progress>;
+        setProgress((local) =>
+          mergeProgress(local, { xp: remote.xp ?? 0, lessons: remote.lessons ?? {} }),
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  // À chaque changement : sauvegarde locale immédiate + envoi au serveur (différé)
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-  }, [progress]);
+    if (!supabase || !userId) return;
+    const client = supabase;
+    const timer = setTimeout(() => {
+      client
+        .from("progress")
+        .upsert({ user_id: userId, data: progress, updated_at: new Date().toISOString() })
+        .then(({ error }) => {
+          if (error) console.warn("Synchronisation impossible :", error.message);
+        });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [progress, userId]);
 
   const completeLesson = useCallback(
     (lessonId: string, opts: { perfect: boolean; practice: boolean }) => {

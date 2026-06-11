@@ -7,9 +7,12 @@ import {
   XP_PER_LEVEL,
 } from "../lib/progress";
 import type { Lesson, Progress, Unit } from "../types";
+import type { AuthApi } from "../lib/auth";
+import AuthModal from "./AuthModal";
 
 interface HomeProps {
   progress: Progress;
+  auth: AuthApi;
   onStartLesson: (unitId: string, lessonId: string, practice: boolean) => void;
 }
 
@@ -20,8 +23,9 @@ interface Selected {
   completed: boolean;
 }
 
-export default function Home({ progress, onStartLesson }: HomeProps) {
+export default function Home({ progress, auth, onStartLesson }: HomeProps) {
   const [selected, setSelected] = useState<Selected | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
   const level = levelFromXp(progress.xp);
 
   return (
@@ -43,6 +47,19 @@ export default function Home({ progress, onStartLesson }: HomeProps) {
               />
             </div>
           </div>
+          {auth.enabled &&
+            (auth.user ? (
+              <div className="stat account" title={auth.user.email ?? ""}>
+                <span className="account-email">👤 {auth.user.email}</span>
+                <button className="btn-link" onClick={() => auth.signOut()}>
+                  Déconnexion
+                </button>
+              </div>
+            ) : (
+              <button className="btn btn-small" onClick={() => setAuthOpen(true)}>
+                Se connecter
+              </button>
+            ))}
         </div>
       </header>
 
@@ -125,6 +142,8 @@ export default function Home({ progress, onStartLesson }: HomeProps) {
           </div>
         </div>
       )}
+
+      {authOpen && <AuthModal auth={auth} onClose={() => setAuthOpen(false)} />}
     </div>
   );
 }
