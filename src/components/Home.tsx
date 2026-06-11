@@ -7,12 +7,12 @@ import {
   XP_PER_LEVEL,
 } from "../lib/progress";
 import type { Lesson, Progress, Unit } from "../types";
-import type { AuthApi } from "../lib/auth";
-import AuthModal from "./AuthModal";
+import type { GoogleAuthApi } from "../lib/googleAuth";
 
 interface HomeProps {
   progress: Progress;
-  auth: AuthApi;
+  auth: GoogleAuthApi;
+  onShowLogin: () => void;
   onStartLesson: (unitId: string, lessonId: string, practice: boolean) => void;
 }
 
@@ -23,9 +23,8 @@ interface Selected {
   completed: boolean;
 }
 
-export default function Home({ progress, auth, onStartLesson }: HomeProps) {
+export default function Home({ progress, auth, onShowLogin, onStartLesson }: HomeProps) {
   const [selected, setSelected] = useState<Selected | null>(null);
-  const [authOpen, setAuthOpen] = useState(false);
   const level = levelFromXp(progress.xp);
 
   return (
@@ -49,14 +48,19 @@ export default function Home({ progress, auth, onStartLesson }: HomeProps) {
           </div>
           {auth.enabled &&
             (auth.user ? (
-              <div className="stat account" title={auth.user.email ?? ""}>
-                <span className="account-email">👤 {auth.user.email}</span>
+              <div className="stat account" title={auth.user.email ?? auth.user.name}>
+                {auth.user.picture ? (
+                  <img className="account-avatar" src={auth.user.picture} alt="" />
+                ) : (
+                  <span>👤</span>
+                )}
+                <span className="account-email">{auth.user.name}</span>
                 <button className="btn-link" onClick={() => auth.signOut()}>
                   Déconnexion
                 </button>
               </div>
             ) : (
-              <button className="btn btn-small" onClick={() => setAuthOpen(true)}>
+              <button className="btn btn-small" onClick={onShowLogin}>
                 Se connecter
               </button>
             ))}
@@ -142,8 +146,6 @@ export default function Home({ progress, auth, onStartLesson }: HomeProps) {
           </div>
         </div>
       )}
-
-      {authOpen && <AuthModal auth={auth} onClose={() => setAuthOpen(false)} />}
     </div>
   );
 }

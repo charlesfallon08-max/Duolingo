@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Progress } from "../types";
 import { course } from "../data/course";
-import { supabase } from "./supabase";
 
 export const XP_LESSON = 10;
 export const XP_PERFECT_BONUS = 5;
@@ -10,13 +9,18 @@ export const XP_PER_LEVEL = 50;
 
 const STORAGE_KEY = "lingua-progress-v1";
 
+/** Chaque compte Google a sa propre progression sur l'appareil. */
+function keyFor(userId: string | null): string {
+  return userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY;
+}
+
 function defaultProgress(): Progress {
   return { xp: 0, lessons: {} };
 }
 
-function load(): Progress {
+function load(key: string): Progress {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return defaultProgress();
     const saved = JSON.parse(raw) as Partial<Progress>;
     return { xp: saved.xp ?? 0, lessons: saved.lessons ?? {} };
@@ -25,7 +29,7 @@ function load(): Progress {
   }
 }
 
-/** Fusionne deux progressions (appareil + serveur) sans jamais perdre d'acquis. */
+/** Fusionne deux progressions sans jamais perdre d'acquis. */
 function mergeProgress(a: Progress, b: Progress): Progress {
   const lessons = { ...a.lessons };
   for (const [id, rec] of Object.entries(b.lessons)) {
@@ -48,48 +52,18 @@ export function xpIntoLevel(xp: number): number {
   return xp % XP_PER_LEVEL;
 }
 
-/**
- * Progression du joueur : toujours sauvegardée en local, et synchronisée
- * avec Supabase quand un utilisateur est connecté (userId non null).
- */
 export function useProgress(userId: string | null) {
-  const [progress, setProgress] = useState<Progress>(load);
+  const [progress, setProgress] = useState<Progress>(() => load(keyFor(userId)));
 
-  // À la connexion : récupère la progression du serveur et fusionne
+  // Changement de compte : charge la progression du compte, en adoptant
+  // ce qui a été fait sans compte sur cet appareil (rien n'est perdu)
   useEffect(() => {
-    if (!supabase || !userId) return;
-    let cancelled = false;
-    supabase
-      .from("progress")
-      .select("data")
-      .eq("user_id", userId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled || !data?.data) return;
-        const remote = data.data as Partial<Progress>;
-        setProgress((local) =>
-          mergeProgress(local, { xp: remote.xp ?? 0, lessons: remote.lessons ?? {} }),
-        );
-      });
-    return () => {
-      cancelled = true;
-    };
+    const own = load(keyFor(userId));
+    setProgress(userId ? mergeProgress(own, load(STORAGE_KEY)) : own);
   }, [userId]);
 
-  // À chaque changement : sauvegarde locale immédiate + envoi au serveur (différé)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    if (!supabase || !userId) return;
-    const client = supabase;
-    const timer = setTimeout(() => {
-      client
-        .from("progress")
-        .upsert({ user_id: userId, data: progress, updated_at: new Date().toISOString() })
-        .then(({ error }) => {
-          if (error) console.warn("Synchronisation impossible :", error.message);
-        });
-    }, 800);
-    return () => clearTimeout(timer);
+    localStorage.setItem(keyFor(userId), JSON.stringify(progress));
   }, [progress, userId]);
 
   const completeLesson = useCallback(

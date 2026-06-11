@@ -20,10 +20,11 @@ Une plateforme d'apprentissage des langues inspirée de Duolingo, pour apprendre
   s'entraîner autant qu'on veut.
 - **XP et niveaux** : +10 XP par leçon, +5 de bonus sans faute, +5 XP en
   entraînement. Un niveau tous les 50 XP.
-- **Progression sauvegardée** automatiquement dans le navigateur, et **comptes
-  utilisateurs optionnels** (Supabase) pour la retrouver sur tous ses
-  appareils — voir [INSTALLATION-COMPTES.md](INSTALLATION-COMPTES.md). Sans
-  configuration Supabase, le site fonctionne en mode local.
+- **Progression sauvegardée** automatiquement dans le navigateur, avec
+  **connexion Google optionnelle** : une page « Continuer avec Google »
+  accueille les joueurs et la progression est enregistrée au nom de chacun
+  sur l'appareil — voir [INSTALLATION-GOOGLE.md](INSTALLATION-GOOGLE.md).
+  Sans configuration, le site s'ouvre directement.
 
 ## Lancer le projet
 

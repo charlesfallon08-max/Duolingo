@@ -227,58 +227,58 @@ button {
   font-size: 13px;
 }
 
-/* ---------- Connexion ---------- */
-.btn-google {
-  background: #fff;
-  color: var(--text);
-  border: 2px solid var(--gray-200);
-  border-bottom-width: 4px;
-  box-shadow: none;
-  text-transform: none;
+/* ---------- Page de connexion ---------- */
+.login-gate {
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-size: 15px;
+  padding: 24px;
+  background: linear-gradient(160deg, #58cc02 0%, #2fa946 100%);
 }
-.btn-google:hover:not(:disabled) {
-  background: var(--gray-100);
-}
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--gray-400);
-  font-weight: 700;
-  font-size: 13px;
-  text-transform: uppercase;
-}
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 2px;
-  background: var(--gray-200);
-}
-.auth-form {
+.login-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
-.auth-form .type-input {
-  margin-top: 0;
+.login-logo {
+  font-size: 56px;
 }
-.auth-error {
+.login-card h1 {
   margin: 0;
-  color: var(--red-dark);
-  font-weight: 700;
-  font-size: 14px;
+  font-size: 34px;
+  font-weight: 900;
+  color: var(--green);
 }
-.auth-info {
+.login-tagline {
   margin: 0;
-  color: var(--green-dark);
-  font-weight: 700;
-  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+.google-button {
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+}
+.login-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+.account-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
 }
 
 /* ---------- Modale ---------- */
