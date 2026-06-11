@@ -54,6 +54,37 @@ lien. Pour permettre de jouer immédiatement après l'inscription :
 1. Supabase → **Authentication** → **Sign In / Up** → fournisseur **Email**.
 2. Désactive **Confirm email** et sauvegarde.
 
+## Étape 6 — (Optionnel) Activer « Continuer avec Google »
+
+Le bouton Google est déjà dans le site ; il faut juste donner à Supabase des
+identifiants Google. Durée : ~10 minutes, gratuit.
+
+1. **Récupère l'adresse de retour Supabase** : Supabase → **Authentication** →
+   **Sign In / Up** → fournisseur **Google** → copie la **Callback URL**
+   (ressemble à `https://xxxx.supabase.co/auth/v1/callback`). Garde cette page
+   ouverte.
+2. **Crée les identifiants Google** sur
+   [console.cloud.google.com](https://console.cloud.google.com) :
+   - Crée un projet (ex. `lingua`).
+   - Menu → **APIs & Services** → **OAuth consent screen** : type **External**,
+     renseigne le nom de l'appli et ton email, sauvegarde (tu peux ignorer les
+     étapes facultatives).
+   - Menu → **APIs & Services** → **Credentials** → **Create credentials** →
+     **OAuth client ID** → type **Web application** :
+     - « Authorized JavaScript origins » : l'adresse de ton site
+       (ex. `https://duolingo-xxx.vercel.app`)
+     - « Authorized redirect URIs » : la **Callback URL** copiée à l'étape 1
+   - Valide : Google t'affiche un **Client ID** et un **Client secret**.
+3. **Colle-les dans Supabase** : retourne sur la page Google de l'étape 1,
+   active le fournisseur, colle Client ID + Client secret, sauvegarde.
+4. **Déclare l'adresse de ton site** : Supabase → **Authentication** →
+   **URL Configuration** → mets ton adresse Vercel dans **Site URL** (c'est là
+   que Google renverra les joueurs après connexion).
+
+> Si Google affiche un écran « appli non vérifiée » pendant tes tests : dans
+> l'OAuth consent screen, ajoute ton adresse Gmail comme « Test user », ou
+> clique sur « Publish app ».
+
 ## C'est terminé 🎉
 
 Recharge le site : le bouton **Se connecter** apparaît en haut à droite.

@@ -18,6 +18,7 @@ export interface AuthApi {
   user: AuthUser | null;
   signUp: (email: string, password: string) => Promise<AuthResult>;
   signIn: (email: string, password: string) => Promise<AuthResult>;
+  signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -68,6 +69,15 @@ export function useAuth(): AuthApi {
     async signIn(email, password) {
       if (!supabase) return { error: "Comptes non configurés." };
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error ? frenchError(error.message) : null };
+    },
+    async signInWithGoogle() {
+      if (!supabase) return { error: "Comptes non configurés." };
+      // Redirige vers Google puis revient sur le site, déjà connecté
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      });
       return { error: error ? frenchError(error.message) : null };
     },
     async signOut() {
