@@ -1,8 +1,9 @@
 {
-  "apiKey": "",
-  "authDomain": "",
-  "projectId": "",
-  "storageBucket": "",
-  "messagingSenderId": "",
-  "appId": ""
+  "apiKey": "AIzaSyCe4qXUNo5zvZWUKS8ya_9hazCw5eAQgLQ",
+  "authDomain": "lingua-1708a.firebaseapp.com",
+  "projectId": "lingua-1708a",
+  "storageBucket": "lingua-1708a.firebasestorage.app",
+  "messagingSenderId": "309502463655",
+  "appId": "1:309502463655:web:de2005d416b68113241582",
+  "measurementId": "G-DMZCZR3TKN"
 }
