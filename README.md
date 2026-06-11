@@ -13,6 +13,9 @@ Une plateforme d'apprentissage des langues inspirée de Duolingo, pour apprendre
   - Traduction de phrases avec banque de mots
   - Saisie libre (accents et majuscules non pénalisés)
   - Paires à associer
+- **Audio** : les mots et phrases en espagnol sont lus à voix haute (synthèse
+  vocale du navigateur) — lecture automatique, boutons 🔊 et 🐢 (vitesse
+  lente), prononciation des mots touchés, et bouton pour couper le son.
 - **Aucune limite** : pas de système de vies — on peut se tromper et
   s'entraîner autant qu'on veut.
 - **XP et niveaux** : +10 XP par leçon, +5 de bonus sans faute, +5 XP en

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { Exercise, Lesson, Unit } from "../types";
 import { buildSession, checkTyped, checkWordBank } from "../lib/exercises";
 import { XP_LESSON, XP_PERFECT_BONUS, XP_PRACTICE } from "../lib/progress";
+import { isSoundEnabled, setSoundEnabled, speakSpanish, speechSupported } from "../lib/speech";
 import ChoiceExercise from "./exercises/ChoiceExercise";
 import WordBankExercise from "./exercises/WordBankExercise";
 import TypeExercise from "./exercises/TypeExercise";
@@ -45,6 +46,7 @@ export default function LessonScreen({
   const [choiceIdx, setChoiceIdx] = useState<number | null>(null);
   const [bankChosen, setBankChosen] = useState<number[]>([]);
   const [typed, setTyped] = useState("");
+  const [sound, setSound] = useState(isSoundEnabled());
 
   const exercise = exercises[index];
   const total = exercises.length;
@@ -69,6 +71,8 @@ export default function LessonScreen({
 
     if (ok) {
       setPhase("correct");
+      // Renforce l'écoute en relisant la phrase espagnole complète
+      if (exercise.type === "wordbank") speakSpanish(exercise.targetEs);
     } else {
       setPhase("wrong");
       setMistakes((m) => m + 1);
@@ -122,6 +126,19 @@ export default function LessonScreen({
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${(index / total) * 100}%` }} />
         </div>
+        {speechSupported && (
+          <button
+            className="quit"
+            onClick={() => {
+              setSound(!sound);
+              setSoundEnabled(!sound);
+            }}
+            aria-label={sound ? "Couper le son" : "Activer le son"}
+            title={sound ? "Couper le son" : "Activer le son"}
+          >
+            {sound ? "🔊" : "🔇"}
+          </button>
+        )}
         <div className="lesson-hearts">{practice ? "🔁" : lesson.icon}</div>
       </header>
 

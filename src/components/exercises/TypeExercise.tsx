@@ -1,4 +1,5 @@
 import type { Exercise } from "../../types";
+import SpanishPrompt from "./SpanishPrompt";
 
 interface Props {
   exercise: Extract<Exercise, { type: "type" }>;
@@ -12,7 +13,7 @@ export default function TypeExercise({ exercise, value, onChange, onSubmit, lock
   return (
     <div className="exercise">
       <h2 className="exercise-title">Écris la traduction en français</h2>
-      <p className="exercise-prompt">🇪🇸 {exercise.promptEs}</p>
+      <SpanishPrompt text={exercise.promptEs} />
       <input
         className="type-input"
         type="text"

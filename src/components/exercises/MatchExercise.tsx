@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Exercise } from "../../types";
 import { shuffle } from "../../lib/text";
+import { speakSpanish } from "../../lib/speech";
 
 interface Props {
   exercise: Extract<Exercise, { type: "match" }>;
@@ -50,6 +51,7 @@ export default function MatchExercise({ exercise, onMistake, onComplete }: Props
               disabled={matched.has(es)}
               onClick={() => {
                 const v = selEs === es ? null : es;
+                if (v) speakSpanish(v);
                 setSelEs(v);
                 tryMatch(v, selFr);
               }}

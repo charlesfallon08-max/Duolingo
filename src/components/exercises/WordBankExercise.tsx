@@ -1,4 +1,5 @@
 import type { Exercise } from "../../types";
+import { speakSpanish } from "../../lib/speech";
 
 interface Props {
   exercise: Extract<Exercise, { type: "wordbank" }>;
@@ -36,7 +37,10 @@ export default function WordBankExercise({ exercise, chosen, onChange, locked }:
               key={i}
               className={`token ${used ? "used" : ""}`}
               disabled={locked || used}
-              onClick={() => onChange([...chosen, i])}
+              onClick={() => {
+                speakSpanish(token);
+                onChange([...chosen, i]);
+              }}
             >
               {token}
             </button>
