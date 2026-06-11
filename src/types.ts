@@ -60,8 +60,5 @@ export interface LessonRecord {
 
 export interface Progress {
   xp: number;
-  hearts: number;
-  /** Horodatage (ms) de la dernière régénération de cœur */
-  lastHeartAt: number;
   lessons: Record<string, LessonRecord>;
 }

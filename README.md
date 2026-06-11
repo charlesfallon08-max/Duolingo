@@ -13,8 +13,8 @@ Une plateforme d'apprentissage des langues inspirée de Duolingo, pour apprendre
   - Traduction de phrases avec banque de mots
   - Saisie libre (accents et majuscules non pénalisés)
   - Paires à associer
-- **Cœurs** : 5 vies, une erreur coûte un cœur ; ils se régénèrent (1 toutes les
-  30 minutes) et on peut en regagner en s'entraînant sur une leçon terminée.
+- **Aucune limite** : pas de système de vies — on peut se tromper et
+  s'entraîner autant qu'on veut.
 - **XP et niveaux** : +10 XP par leçon, +5 de bonus sans faute, +5 XP en
   entraînement. Un niveau tous les 50 XP.
 - **Progression sauvegardée** dans le navigateur (localStorage) — pas de compte

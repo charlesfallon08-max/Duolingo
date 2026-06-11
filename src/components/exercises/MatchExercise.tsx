@@ -4,7 +4,7 @@ import { shuffle } from "../../lib/text";
 
 interface Props {
   exercise: Extract<Exercise, { type: "match" }>;
-  /** Une erreur d'association compte pour la précision mais ne coûte pas de cœur */
+  /** Une erreur d'association compte seulement pour la précision */
   onMistake: () => void;
   onComplete: () => void;
 }

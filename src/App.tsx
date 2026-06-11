@@ -10,7 +10,7 @@ type View =
 
 export default function App() {
   const [view, setView] = useState<View>({ screen: "home" });
-  const { progress, loseHeart, completeLesson } = useProgress();
+  const { progress, completeLesson } = useProgress();
 
   if (view.screen === "lesson") {
     const { unit, lesson } = findLesson(view.unitId, view.lessonId);
@@ -20,8 +20,6 @@ export default function App() {
         unit={unit}
         lesson={lesson}
         practice={view.practice}
-        hearts={progress.hearts}
-        onLoseHeart={loseHeart}
         onComplete={(perfect) =>
           completeLesson(lesson.id, { perfect, practice: view.practice })
         }

@@ -101,11 +101,6 @@ button {
   align-items: center;
   gap: 8px;
 }
-.heart-timer {
-  font-size: 12px;
-  color: var(--text-light);
-  font-weight: 600;
-}
 .level-bar {
   width: 90px;
   height: 10px;

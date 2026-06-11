@@ -11,13 +11,11 @@ interface LessonScreenProps {
   unit: Unit;
   lesson: Lesson;
   practice: boolean;
-  hearts: number;
-  onLoseHeart: () => void;
   onComplete: (perfect: boolean) => void;
   onExit: () => void;
 }
 
-type Phase = "answering" | "correct" | "wrong" | "done" | "failed";
+type Phase = "answering" | "correct" | "wrong" | "done";
 
 function correctAnswerOf(ex: Exercise): string {
   switch (ex.type) {
@@ -36,8 +34,6 @@ export default function LessonScreen({
   unit,
   lesson,
   practice,
-  hearts,
-  onLoseHeart,
   onComplete,
   onExit,
 }: LessonScreenProps) {
@@ -76,16 +72,10 @@ export default function LessonScreen({
     } else {
       setPhase("wrong");
       setMistakes((m) => m + 1);
-      if (!practice) onLoseHeart();
     }
   }
 
   function next() {
-    // Échec si plus de cœurs (le compteur est déjà décrémenté)
-    if (phase === "wrong" && !practice && hearts === 0) {
-      setPhase("failed");
-      return;
-    }
     if (index + 1 >= total) {
       onComplete(mistakes === 0);
       setPhase("done");
@@ -115,31 +105,9 @@ export default function LessonScreen({
               {Math.round((total / (total + mistakes)) * 100)} %
             </span>
           </div>
-          {practice && (
-            <div className="end-card">
-              <span className="end-card-label">Cœur regagné</span>
-              <span className="end-card-value">❤️ +1</span>
-            </div>
-          )}
         </div>
         <button className="btn btn-primary" onClick={onExit}>
           Continuer
-        </button>
-      </div>
-    );
-  }
-
-  if (phase === "failed") {
-    return (
-      <div className="lesson-end">
-        <div className="end-emoji">💔</div>
-        <h2>Tu n'as plus de cœurs !</h2>
-        <p className="end-sub">
-          Attends qu'ils se régénèrent ou entraîne-toi sur une leçon déjà terminée pour en
-          regagner.
-        </p>
-        <button className="btn btn-primary" onClick={onExit}>
-          Retour au parcours
         </button>
       </div>
     );
@@ -154,7 +122,7 @@ export default function LessonScreen({
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${(index / total) * 100}%` }} />
         </div>
-        <div className="lesson-hearts">{practice ? "🔁" : `❤️ ${hearts}`}</div>
+        <div className="lesson-hearts">{practice ? "🔁" : lesson.icon}</div>
       </header>
 
       <main className="exercise-area">
