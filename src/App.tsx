@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { findLesson } from "./data/course";
-import { useGoogleAuth } from "./lib/googleAuth";
+import { useAuth } from "./lib/auth";
 import { useProgress } from "./lib/progress";
 import Home from "./components/Home";
 import LessonScreen from "./components/LessonScreen";
@@ -14,11 +14,16 @@ const SKIP_KEY = "lingua-skip-login";
 
 export default function App() {
   const [view, setView] = useState<View>({ screen: "home" });
-  const auth = useGoogleAuth();
+  const auth = useAuth();
   const [skippedLogin, setSkippedLogin] = useState(
     () => localStorage.getItem(SKIP_KEY) === "1",
   );
   const { progress, completeLesson } = useProgress(auth.user?.id ?? null);
+
+  // Laisse Firebase restaurer la session avant d'afficher quoi que ce soit
+  if (auth.enabled && !auth.ready) {
+    return <div className="loading-screen">🇪🇸</div>;
+  }
 
   // Page de connexion Google à l'entrée du site
   if (auth.enabled && !auth.user && !skippedLogin) {

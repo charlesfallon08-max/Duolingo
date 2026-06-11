@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { Progress } from "../types";
 import { course } from "../data/course";
+import { db } from "./firebase";
 
 export const XP_LESSON = 10;
 export const XP_PERFECT_BONUS = 5;
@@ -62,8 +64,36 @@ export function useProgress(userId: string | null) {
     setProgress(userId ? mergeProgress(own, load(STORAGE_KEY)) : own);
   }, [userId]);
 
+  // À la connexion : récupère la progression en ligne et fusionne
+  useEffect(() => {
+    if (!db || !userId) return;
+    let cancelled = false;
+    getDoc(doc(db, "progress", userId))
+      .then((snap) => {
+        if (cancelled || !snap.exists()) return;
+        const remote = snap.data() as Partial<Progress>;
+        setProgress((local) =>
+          mergeProgress(local, { xp: remote.xp ?? 0, lessons: remote.lessons ?? {} }),
+        );
+      })
+      .catch((e) => console.warn("Lecture de la sauvegarde en ligne impossible :", e));
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  // À chaque changement : sauvegarde locale immédiate + envoi en ligne (différé)
   useEffect(() => {
     localStorage.setItem(keyFor(userId), JSON.stringify(progress));
+    if (!db || !userId) return;
+    const database = db;
+    const timer = setTimeout(() => {
+      setDoc(doc(database, "progress", userId), {
+        ...progress,
+        updatedAt: Date.now(),
+      }).catch((e) => console.warn("Sauvegarde en ligne impossible :", e));
+    }, 800);
+    return () => clearTimeout(timer);
   }, [progress, userId]);
 
   const completeLesson = useCallback(

@@ -7,11 +7,11 @@ import {
   XP_PER_LEVEL,
 } from "../lib/progress";
 import type { Lesson, Progress, Unit } from "../types";
-import type { GoogleAuthApi } from "../lib/googleAuth";
+import type { AuthApi } from "../lib/auth";
 
 interface HomeProps {
   progress: Progress;
-  auth: GoogleAuthApi;
+  auth: AuthApi;
   onShowLogin: () => void;
   onStartLesson: (unitId: string, lessonId: string, practice: boolean) => void;
 }
