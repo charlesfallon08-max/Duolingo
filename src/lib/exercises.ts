@@ -13,25 +13,29 @@ export function buildSession(lesson: Lesson, unit: Unit): Exercise[] {
   // Réservoir d'intrus : tous les mots du chapitre, hors leçon courante en priorité
   const unitWords = unit.lessons.flatMap((l) => l.items.filter((i) => !i.sentence));
 
-  const exercises: Exercise[] = [];
+  // On découvre d'abord chaque mot en QCM (les options aident), et la saisie
+  // libre n'arrive qu'en fin de session, uniquement sur des mots déjà vus.
+  const sessionWords = pick(words, 4);
+  const typedWords = pick(sessionWords, 2);
 
-  // QCM dans les deux sens sur des mots variés
-  for (const item of pick(words, 4)) {
-    exercises.push(
-      Math.random() < 0.5
-        ? makeChoiceEsToFr(item, unitWords)
-        : makeChoiceFrToEs(item, unitWords),
-    );
+  const discovery: Exercise[] = [];
+  const review: Exercise[] = [];
+
+  // Premier contact : toujours espagnol -> français (on lit/écoute le mot
+  // nouveau et on choisit sa traduction parmi les options)
+  for (const item of sessionWords) {
+    discovery.push(makeChoiceEsToFr(item, unitWords));
   }
 
   // Banque de mots sur les phrases de la leçon
   for (const item of pick(sentences, 2)) {
-    exercises.push(makeWordBank(item, unitWords));
+    discovery.push(makeWordBank(item, unitWords));
   }
 
-  // Saisie libre (espagnol -> français)
-  for (const item of pick(words, 2)) {
-    exercises.push({
+  // Deuxième passage : QCM inversé (français -> espagnol) puis saisie libre
+  for (const item of typedWords) {
+    review.push(makeChoiceFrToEs(item, unitWords));
+    review.push({
       type: "type",
       promptEs: item.es,
       answers: [item.fr, ...(item.altFr ?? [])],
@@ -39,15 +43,17 @@ export function buildSession(lesson: Lesson, unit: Unit): Exercise[] {
   }
 
   // Paires à associer
-  exercises.push(makeMatch(words));
+  review.push(makeMatch(words));
 
   // QCM supplémentaire sur une phrase pour finir
   if (sentences.length > 0) {
     const item = pick(sentences, 1)[0];
-    exercises.push(makeChoiceEsToFr(item, sentences.length > 2 ? sentences : unit.lessons.flatMap((l) => l.items.filter((i) => i.sentence))));
+    review.push(makeChoiceEsToFr(item, sentences.length > 2 ? sentences : unit.lessons.flatMap((l) => l.items.filter((i) => i.sentence))));
   }
 
-  return shuffle(exercises);
+  // On mélange chaque moitié, mais la découverte reste avant la révision :
+  // un mot n'est jamais demandé en saisie avant d'avoir été rencontré.
+  return [...shuffle(discovery), ...shuffle(review)];
 }
 
 function distractors(correct: VocabItem, pool: VocabItem[], field: "es" | "fr", n: number): string[] {
